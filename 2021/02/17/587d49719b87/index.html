@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"abumaster.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="接下来根据详细的栗子，说明GC日志的查看，JVM参数的调整。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="垃圾回收实战">
+<meta property="og:url" content="https://abumaster.com/2021/02/17/587d49719b87/index.html">
+<meta property="og:site_name" content="张国丰">
+<meta property="og:description" content="接下来根据详细的栗子，说明GC日志的查看，JVM参数的调整。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://latex.codecogs.com/gif.latex?Eden=\frac{R*Y}{R&plus;1&plus;1},&space;Survivor=\frac{Y}{R&plus;1&plus;1}">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/U851f7b5750044e8bb8e99a675ff9d147b.jpg">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/Udd76fb7a69c34259abd601d846c337656.jpg">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/Uc88b1e6293164be0af878a458bc76a5ep.jpg">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/U568d81fe1cec4b7fb0f59d29e6d53704u.jpg">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/U67a5b8fb88014bbb9b11fe434e31d40cT.jpg">
+<meta property="article:published_time" content="2021-02-17T10:23:13.000Z">
+<meta property="article:modified_time" content="2021-07-18T14:15:35.390Z">
+<meta property="article:author" content="abumaster">
+<meta property="article:tag" content="架构">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="JVM">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://latex.codecogs.com/gif.latex?Eden=\frac{R*Y}{R&plus;1&plus;1},&space;Survivor=\frac{Y}{R&plus;1&plus;1}">
+
+<link rel="canonical" href="https://abumaster.com/2021/02/17/587d49719b87/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>垃圾回收实战 | 张国丰</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-180676830-1"></script>
+    <script data-pjax>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-180676830-1');
+      }
+    </script>
+
+
+  <script data-pjax>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?0181b489d29ea00055dcd71fb036bb70";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/sitemap.xml" title="张国丰" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+<a target="_blank" rel="noopener" href="https://github.com/abumaster" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta custom-logo">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">张国丰</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">记录生活的点滴美好</p>
+      <a>
+        <img class="custom-logo-image" src="/uploads/logo.jpg" alt="张国丰">
+      </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section">首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section">关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section">标签<span class="badge">16</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section">分类<span class="badge">4</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section">归档<span class="badge">32</span></a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section">站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-commonweal">
+
+    <a href="/404.html" rel="section">公益 404</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger">搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/abumaster" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://abumaster.com/2021/02/17/587d49719b87/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="abumaster">
+      <meta itemprop="description" content="明年岂无年，心事恐蹉跎。<br/>努力尽今夕，少年犹可夸。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张国丰">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          垃圾回收实战
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-02-17 10:23:13" itemprop="dateCreated datePublished" datetime="2021-02-17T10:23:13Z">2021-02-17</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index"><span itemprop="name">学习</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2021/02/17/587d49719b87/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2021/02/17/587d49719b87/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>接下来根据详细的栗子，说明GC日志的查看，JVM参数的调整。</p>
+<a id="more"></a>
+
+<h2 id="JVM参数配置"><a href="#JVM参数配置" class="headerlink" title="JVM参数配置"></a>JVM参数配置</h2><p>工作中常用的JVM参数配置，及如何调优。</p>
+<h3 id="JVM参数类型"><a href="#JVM参数类型" class="headerlink" title="JVM参数类型"></a>JVM参数类型</h3><ul>
+<li>标准参数（-），JVM各个版本基本保持不变，相对稳定且向后兼容；</li>
+<li>非标准参数（-X），变化较小的参数，默认JVM实现参数，且不保证向后兼容；</li>
+<li>非Stable参数（-XX），各个JVM的实现不同，将来可能会取消。</li>
+</ul>
+<h4 id="标准参数"><a href="#标准参数" class="headerlink" title="标准参数"></a>标准参数</h4><p>标准参数可以输入<code>java</code>查看：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">用法: java [-options] class [args...]</span><br><span class="line">           (执行类)</span><br><span class="line">   或  java [-options] -jar jarfile [args...]</span><br><span class="line">           (执行 jar 文件)</span><br><span class="line">其中选项包括:</span><br><span class="line">    -d32          使用 32 位数据模型 (如果可用)</span><br><span class="line">    -d64          使用 64 位数据模型 (如果可用)</span><br><span class="line">    -server       选择 &quot;server&quot; VM</span><br><span class="line">                  默认 VM 是 server.</span><br><span class="line"></span><br><span class="line">    -cp &lt;目录和 zip&#x2F;jar 文件的类搜索路径&gt;</span><br><span class="line">    -classpath &lt;目录和 zip&#x2F;jar 文件的类搜索路径&gt;</span><br><span class="line">                  用 ; 分隔的目录, JAR 档案</span><br><span class="line">                  和 ZIP 档案列表, 用于搜索类文件。</span><br><span class="line">    -D&lt;名称&gt;&#x3D;&lt;值&gt;</span><br><span class="line">                  设置系统属性</span><br><span class="line">    -verbose:[class|gc|jni]</span><br><span class="line">                  启用详细输出</span><br><span class="line">    -version      输出产品版本并退出</span><br><span class="line">    -version:&lt;值&gt;</span><br><span class="line">                  警告: 此功能已过时, 将在</span><br><span class="line">                  未来发行版中删除。</span><br><span class="line">                  需要指定的版本才能运行</span><br><span class="line">    -showversion  输出产品版本并继续</span><br><span class="line">    -jre-restrict-search | -no-jre-restrict-search</span><br><span class="line">                  警告: 此功能已过时, 将在</span><br><span class="line">                  未来发行版中删除。</span><br><span class="line">                  在版本搜索中包括&#x2F;排除用户专用 JRE</span><br><span class="line">    -? -help      输出此帮助消息</span><br><span class="line">    -X            输出非标准选项的帮助</span><br><span class="line">    -ea[:&lt;packagename&gt;...|:&lt;classname&gt;]</span><br><span class="line">    -enableassertions[:&lt;packagename&gt;...|:&lt;classname&gt;]</span><br><span class="line">                  按指定的粒度启用断言</span><br><span class="line">    -da[:&lt;packagename&gt;...|:&lt;classname&gt;]</span><br><span class="line">    -disableassertions[:&lt;packagename&gt;...|:&lt;classname&gt;]</span><br><span class="line">                  禁用具有指定粒度的断言</span><br><span class="line">    -esa | -enablesystemassertions</span><br><span class="line">                  启用系统断言</span><br><span class="line">    -dsa | -disablesystemassertions</span><br><span class="line">                  禁用系统断言</span><br><span class="line">    -agentlib:&lt;libname&gt;[&#x3D;&lt;选项&gt;]</span><br><span class="line">                  加载本机代理库 &lt;libname&gt;, 例如 -agentlib:hprof</span><br><span class="line">                  另请参阅 -agentlib:jdwp&#x3D;help 和 -agentlib:hprof&#x3D;help</span><br><span class="line">    -agentpath:&lt;pathname&gt;[&#x3D;&lt;选项&gt;]</span><br><span class="line">                  按完整路径名加载本机代理库</span><br><span class="line">    -javaagent:&lt;jarpath&gt;[&#x3D;&lt;选项&gt;]</span><br><span class="line">                  加载 Java 编程语言代理, 请参阅 java.lang.instrument</span><br><span class="line">    -splash:&lt;imagepath&gt;</span><br><span class="line">                  使用指定的图像显示启动屏幕</span><br><span class="line">有关详细信息, 请参阅 http:&#x2F;&#x2F;www.oracle.com&#x2F;technetwork&#x2F;java&#x2F;javase&#x2F;documentation&#x2F;index.html。</span><br></pre></td></tr></table></figure>
+<h4 id="非标准参数"><a href="#非标准参数" class="headerlink" title="非标准参数"></a>非标准参数</h4><p>非标准参数可以输入:<code>java -X</code>查看：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">-Xmixed           混合模式执行（默认）</span><br><span class="line">-Xint             仅解释模式执行</span><br><span class="line">-Xbootclasspath:&lt;用 ; 分隔的目录和 zip&#x2F;jar 文件&gt;设置引导类和资源的搜索路径</span><br><span class="line">-Xbootclasspath&#x2F;a:&lt;用 ; 分隔的目录和 zip&#x2F;jar 文件&gt;附加在引导类路径末尾</span><br><span class="line">-Xbootclasspath&#x2F;p:&lt;用 ; 分隔的目录和 zip&#x2F;jar 文件&gt;置于引导类路径之前</span><br><span class="line">-Xdiag            显示附加诊断消息</span><br><span class="line">-Xnoclassgc        禁用类垃圾收集</span><br><span class="line">-Xincgc           启用增量垃圾收集</span><br><span class="line">-Xloggc:&lt;file&gt;    将 GC 状态记录在文件中（带时间戳）</span><br><span class="line">-Xbatch           禁用后台编译</span><br><span class="line">-Xms&lt;size&gt;        设置初始 Java 堆大小</span><br><span class="line">-Xmx&lt;size&gt;        设置最大 Java 堆大小</span><br><span class="line">-Xss&lt;size&gt;        设置 Java 线程堆栈大小</span><br><span class="line">-Xprof            输出 cpu 分析数据</span><br><span class="line">-Xfuture          启用最严格的检查，预计会成为将来的默认值</span><br><span class="line">-Xrs              减少 Java&#x2F;VM 对操作系统信号的使用（请参阅文档）</span><br><span class="line">-Xcheck:jni       对 JNI 函数执行其他检查</span><br><span class="line">-Xshare:off       不尝试使用共享类数据</span><br><span class="line">-Xshare:auto      在可能的情况下使用共享类数据（默认）</span><br><span class="line">-Xshare:on        要求使用共享类数据，否则将失败。</span><br><span class="line">-XshowSettings    显示所有设置并继续</span><br><span class="line">-XshowSettings:system（仅限 Linux）显示系统或容器配置并继续</span><br><span class="line">-XshowSettings:all显示所有设置并继续</span><br><span class="line">-XshowSettings:vm 显示所有与 vm 相关的设置并继续</span><br><span class="line">-XshowSettings:properties显示所有属性设置并继续</span><br><span class="line">-XshowSettings:locale显示所有与区域设置相关的设置并继续</span><br><span class="line"></span><br><span class="line">-X 选项是非标准选项。如有更改，恕不另行通知。</span><br></pre></td></tr></table></figure>
+
+<h4 id="非stable参数"><a href="#非stable参数" class="headerlink" title="非stable参数"></a>非stable参数</h4><p>使用<code>-XX:+PrintFlagsInitial</code>查看初始属性。<br>主要分为<strong>键值对</strong>、<strong>布尔型</strong>参数。<br><strong>键值对</strong>：<br><code>-XX:属性key=属性value</code>，比如，<code>-XX:MetaspaceSize=128m</code>表示设置元空间的大小。<br><strong>布尔型</strong>：<br><code>-XX:+属性值（开启）/-属性值（关闭）</code>，比如，<code>-XX:+PrintGCDetails</code>打印GC的细节。</p>
+<h3 id="常用参数配置"><a href="#常用参数配置" class="headerlink" title="常用参数配置"></a>常用参数配置</h3><table>
+<thead>
+<tr>
+<th>参数名称</th>
+<th>含义</th>
+<th>默认值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-Xms</code></td>
+<td>初始堆大小</td>
+<td>内存的<code>1/64</code></td>
+<td>默认(MinHeapFreeRatio参数可以调整)空余堆内存小于40%时，JVM就会增大堆直到-Xmx的最大限制.</td>
+</tr>
+<tr>
+<td><code>-Xmx</code></td>
+<td>最大堆大小</td>
+<td>内存的<code>1/4</code></td>
+<td>默认(MaxHeapFreeRatio参数可以调整)空余堆内存大于70%时，JVM会减少堆直到 -Xms的最小限制.</td>
+</tr>
+<tr>
+<td><code>-Xmn</code></td>
+<td>年轻代的大小</td>
+<td></td>
+<td>整个堆的<code>3/8</code></td>
+</tr>
+<tr>
+<td><code>-Xss</code></td>
+<td>每个线程堆栈的大小</td>
+<td></td>
+<td>一般小的应用， 如果栈不是很深， 应该是128k够用的 大的应用建议使用256k</td>
+</tr>
+<tr>
+<td><code>-XX:NewSize</code></td>
+<td>年轻代的大小</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>-XX:NewRatio</code></td>
+<td>年轻代比例</td>
+<td></td>
+<td>配置年老代和年轻代的比例,如2,则年老与年轻比为:<code>2:1</code></td>
+</tr>
+<tr>
+<td><code>-XX:SurvivorRatio</code></td>
+<td>Eden区和Survivor区的大小比值</td>
+<td>8</td>
+<td>默认为8，则Eden和两个Survivor的比值为<code>8:1:1</code></td>
+</tr>
+<tr>
+<td><code>-XX:PretenureSizeThreshold</code></td>
+<td>对象超过多大时直接再老年代分配</td>
+<td></td>
+<td>单位为字节</td>
+</tr>
+<tr>
+<td><code>-XX:MaxTenuringThreshold</code></td>
+<td>垃圾最大的年龄</td>
+<td>15,Java8</td>
+<td>如果设置为0的话,则年轻代对象不经过Survivor区,直接进入年老代. 对于年老代比较多的应用,可以提高效率.如果将此值设置为一个较大值,则年轻代对象会在Survivor区进行多次复制,这样可以增加对象再年轻代的存活 时间,增加在年轻代即被回收的概率 该参数只有在串行GC时才有效.</td>
+</tr>
+<tr>
+<td><code>-XX:+HeapDumpOnOutOfMemoryError</code></td>
+<td>堆栈溢出时导出dump文件</td>
+<td></td>
+<td>可以使用MAT分析</td>
+</tr>
+</tbody></table>
+<p><strong>注：</strong><br><code>SurvivorRatio</code>的计算公式如下：<br>R为SurvivorRatio的值，Y为新生代的值，则:<br><img src="https://latex.codecogs.com/gif.latex?Eden=\frac{R*Y}{R&plus;1&plus;1},&space;Survivor=\frac{Y}{R&plus;1&plus;1}" title="Eden=\frac{R*Y}{R+1+1}, Survivor=\frac{Y}{R+1+1}" /><br><code>SurvivorRatio</code>是R，则比例就是<code>R:1:1</code>。</p>
+<p>并行收集器相关参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数名称</th>
+<th>含义</th>
+<th>默认值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-XX:+UseParNewGC</code></td>
+<td>设置年轻代为并行收集</td>
+<td></td>
+<td>可与CMS收集同时使用 JDK5.0以上,JVM会根据系统配置自行设置,所以无需再设置此值</td>
+</tr>
+<tr>
+<td><code>-XX:+UseParallelOldGC</code></td>
+<td>设置老年代为并行收集器</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>-XX:ParallelGCThreads</code></td>
+<td>并行收集器的线程数</td>
+<td></td>
+<td>此值最好配置与处理器数目相等 同样适用于CMS</td>
+</tr>
+<tr>
+<td><code>-XX:MaxGCPauseMillis</code></td>
+<td>每次年轻代垃圾回收的最长时间(最大暂停时间)</td>
+<td></td>
+<td>如果无法满足此时间,JVM会自动调整年轻代大小,以满足此值.</td>
+</tr>
+<tr>
+<td><code>-XX:+UseAdaptiveSizePolicy</code></td>
+<td>自动选择年轻代区大小和相应的Survivor区比例</td>
+<td></td>
+<td>设置此选项后,并行收集器会自动选择年轻代区大小和相应的Survivor区比例,以达到目标系统规定的最低相应时间或者收集频率等,此值建议使用并行收集器时,一直打开.</td>
+</tr>
+<tr>
+<td><code>-XX:GCTimeRatio</code></td>
+<td>设置垃圾回收时间占程序运行时间的百分比</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p><strong>CMS相关参数</strong></p>
+<table>
+<thead>
+<tr>
+<th>参数名称</th>
+<th>含义</th>
+<th>默认值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-XX:+UseConcMarkSweepGC</code></td>
+<td>使用CMS收集器</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>-XX:CMSFullGCsBeforeCompaction</code></td>
+<td>多少次后压缩存储</td>
+<td></td>
+<td>运行多少次GC后，整理碎片。</td>
+</tr>
+<tr>
+<td><code>-XX:+CMSParallelRemarkEnabled</code></td>
+<td>降低标记停顿</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>-XX+UseCMSCompactAtFullCollection</code></td>
+<td>在FULL GC的时候， 对年老代的压缩</td>
+<td></td>
+<td>CMS是不会移动内存的， 因此， 这个非常容易产生碎片， 导致内存不够用， 因此， 内存的压缩这个时候就会被启用。 增加这个参数是个好习惯。 可能会影响性能,但是可以消除碎片</td>
+</tr>
+<tr>
+<td><code>-XX:CMSInitiatingOccupancyFraction</code></td>
+<td>使用cms作为垃圾回收 使用百分之多少后开始CMS收集</td>
+<td>92</td>
+<td>因为CMS并发清除垃圾，会导致一边生成一边清理，因此不能占满后才开始清除，可以设置70，当出现promotion failed时，还要根据需要减小设置。</td>
+</tr>
+</tbody></table>
+<p><strong>辅助信息</strong></p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>含义</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-XX:+PrintGC</code></td>
+<td>输出GC日志</td>
+<td>回收前后内存及耗时</td>
+</tr>
+<tr>
+<td><code>-XX:+PrintGCDetails</code></td>
+<td>输出较详细的GC日志</td>
+<td>包括GC的收集器名称</td>
+</tr>
+<tr>
+<td><code>-XX:+PrintGCTimeStamps</code></td>
+<td>输出耗时时间戳</td>
+<td></td>
+</tr>
+<tr>
+<td><code>-XX:+PrintGCApplicationStoppedTime</code></td>
+<td>打印垃圾回收期间程序暂停的时间.可与上面混合使用</td>
+<td></td>
+</tr>
+<tr>
+<td><code>-XX:+PrintHeapAtGC</code></td>
+<td>打印GC前后的详细堆栈信息</td>
+<td></td>
+</tr>
+<tr>
+<td><code>-Xloggc:filename</code></td>
+<td>把相关日志信息记录到文件以便分析. 与上面几个配合使用</td>
+<td></td>
+</tr>
+<tr>
+<td><code>-XX:+PrintTLAB</code></td>
+<td>查看TLAB空间的使用情况</td>
+<td></td>
+</tr>
+</tbody></table>
+<h2 id="工具的使用"><a href="#工具的使用" class="headerlink" title="工具的使用"></a>工具的使用</h2><h3 id="MAT分析堆转储文件"><a href="#MAT分析堆转储文件" class="headerlink" title="MAT分析堆转储文件"></a>MAT分析堆转储文件</h3><p>线上程序运行的时候，可以加上<code>-XX:+HeapDumpOnOutOfMemoryError</code>参数来导出内存溢出时的堆信息，生成 hrof 文件, 添加<code>-XX:HeapDumpPath</code>可以指定 hprof 文件的生成路径,如果不指定则 hrof 文件生成在与字节码文件相同的目录下。<br><a target="_blank" rel="noopener" href="https://ftp.jaist.ac.jp/pub/eclipse/mat/1.11.0/rcp/MemoryAnalyzer-1.11.0.20201202-win32.win32.x86_64.zip">下载MemoryAnalyzer</a></p>
+<p>将生成的hprof文件导入后,可以根据报告,找到内存溢出的错误发生的位置。<br><img src="https://ae01.alicdn.com/kf/U851f7b5750044e8bb8e99a675ff9d147b.jpg"><br><img src="https://ae01.alicdn.com/kf/Udd76fb7a69c34259abd601d846c337656.jpg"></p>
+<h3 id="VisualVM"><a href="#VisualVM" class="headerlink" title="VisualVM"></a>VisualVM</h3><p>jdk自带的分析工具，可以连接到本地运行的java程序，通过丰富的插件来观察运行过程中的JVM使用情况。<br><img src="https://ae01.alicdn.com/kf/Uc88b1e6293164be0af878a458bc76a5ep.jpg"><br><img src="https://ae01.alicdn.com/kf/U568d81fe1cec4b7fb0f59d29e6d53704u.jpg"></p>
+<h3 id="jconsole"><a href="#jconsole" class="headerlink" title="jconsole"></a>jconsole</h3><p>也是JDK自带的工具，可以远程连接java程序查看运行状况。<br><img src="https://ae01.alicdn.com/kf/U67a5b8fb88014bbb9b11fe434e31d40cT.jpg"></p>
+<h2 id="GC日志的分析"><a href="#GC日志的分析" class="headerlink" title="GC日志的分析"></a>GC日志的分析</h2><p>日志如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">10.703: [GC (Allocation Failure) 10.703: [DefNew: 8192K-&gt;1024K(9216K), 0.0105346 secs] 8192K-&gt;3547K(19456K), 0.0106322 secs] [Times: user&#x3D;0.01 sys&#x3D;0.00, real&#x3D;0.02 secs] </span><br><span class="line">40.239: [Full GC (Allocation Failure) 40.239: [Tenured: 10239K-&gt;10077K(10240K), 0.0177828 secs] 10277K-&gt;10077K(19456K), [Metaspace: 9308K-&gt;9308K(1058816K)], 0.0178940 secs] [Times: user&#x3D;0.02 sys&#x3D;0.00, real&#x3D;0.02 secs] </span><br></pre></td></tr></table></figure>
+<p>开头的时间表示自虚拟机启动后的时间。<br><strong>GC</strong>和<strong>Full GC</strong>表示垃圾收集的类型，Full GC会有STW，有一定的停顿时间；<br><strong>Allocation Failure</strong>表示触发GC的原因；<br><strong>DefNew</strong>、<strong>Tenured</strong>、<strong>Metaspace</strong>表示发生GC的区域，与用到的收集器有关，如Serial收集器就为DefNew，如果是ParNew收集器则名称为ParNew；<br>** 8192K-&gt;1024K(9216K)<strong>表示：GC 前该内存区域已使用容量 -&gt; GC 后该内存区域已使用容量（该内存区域总容量）；<br>**0.0105346 secs</strong>表示整个GC所用的时间，如果多个区域GC则表示是每个区域的耗时；<br><strong>Times: user=0.02 sys=0.00, real=0.02 secs</strong>代表用户态消耗的 CPU 时间，内核态消耗的 CPU 时间，和操作从开始到结束所经过的墙钟时间，墙钟时间包括各种非运算的等待耗时，例如等待磁盘 I/O，等待线程阻塞，而 CPU 时间不包括这些耗时，但当系统有多 CPU 或者多核的话，多线程操作会叠加这些 CPU 时间，所以 user 或 sys 时间是可能超过 real 时间的。</p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>abumaster
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://abumaster.com/2021/02/17/587d49719b87/" title="垃圾回收实战">https://abumaster.com/2021/02/17/587d49719b87/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%9E%B6%E6%9E%84/" rel="tag"># 架构</a>
+              <a href="/tags/Java/" rel="tag"># Java</a>
+              <a href="/tags/JVM/" rel="tag"># JVM</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/02/16/48dfb675769e/" rel="prev" title="垃圾回收">
+      <i class="fa fa-chevron-left"></i> 垃圾回收
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/02/19/8772a3dc4600/" rel="next" title="常见的OOM异常">
+      常见的OOM异常 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#JVM%E5%8F%82%E6%95%B0%E9%85%8D%E7%BD%AE"><span class="nav-number">1.</span> <span class="nav-text">JVM参数配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#JVM%E5%8F%82%E6%95%B0%E7%B1%BB%E5%9E%8B"><span class="nav-number">1.1.</span> <span class="nav-text">JVM参数类型</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A0%87%E5%87%86%E5%8F%82%E6%95%B0"><span class="nav-number">1.1.1.</span> <span class="nav-text">标准参数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%9D%9E%E6%A0%87%E5%87%86%E5%8F%82%E6%95%B0"><span class="nav-number">1.1.2.</span> <span class="nav-text">非标准参数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%9D%9Estable%E5%8F%82%E6%95%B0"><span class="nav-number">1.1.3.</span> <span class="nav-text">非stable参数</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8%E5%8F%82%E6%95%B0%E9%85%8D%E7%BD%AE"><span class="nav-number">1.2.</span> <span class="nav-text">常用参数配置</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B7%A5%E5%85%B7%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="nav-number">2.</span> <span class="nav-text">工具的使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#MAT%E5%88%86%E6%9E%90%E5%A0%86%E8%BD%AC%E5%82%A8%E6%96%87%E4%BB%B6"><span class="nav-number">2.1.</span> <span class="nav-text">MAT分析堆转储文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#VisualVM"><span class="nav-number">2.2.</span> <span class="nav-text">VisualVM</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#jconsole"><span class="nav-number">2.3.</span> <span class="nav-text">jconsole</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GC%E6%97%A5%E5%BF%97%E7%9A%84%E5%88%86%E6%9E%90"><span class="nav-number">3.</span> <span class="nav-text">GC日志的分析</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">abumaster</p>
+  <div class="site-description" itemprop="description">明年岂无年，心事恐蹉跎。<br/>努力尽今夕，少年犹可夸。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">32</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/abumaster" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;abumaster" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:gfzhang92@gmail.com" title="E-Mail → mailto:gfzhang92@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;" rel="noopener" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="http://www.ruanyifeng.com/blog" title="http:&#x2F;&#x2F;www.ruanyifeng.com&#x2F;blog" rel="noopener" target="_blank">科技爱好者周刊</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.infoq.cn/" title="https:&#x2F;&#x2F;www.infoq.cn&#x2F;" rel="noopener" target="_blank">infoq</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://coolshell.cn/" title="https:&#x2F;&#x2F;coolshell.cn&#x2F;" rel="noopener" target="_blank">酷壳</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright">
+  
+  &copy; 2017 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">abumaster</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+<div class="theme-info">
+  <div class="powered-by"></div>
+  <span class="post-count">博客全站共43.2k字</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/pjax/pjax.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '.languages',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[data-pjax], script#page-configurations, #pjax script').forEach(element => {
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (element.id) {
+      script.id = element.id;
+    }
+    if (element.className) {
+      script.className = element.className;
+    }
+    if (element.type) {
+      script.type = element.type;
+    }
+    if (element.src) {
+      script.src = element.src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (element.dataset.pjax !== undefined) {
+      script.dataset.pjax = '';
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.subMenu)
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'Q8k6f8EXgvCgQ9Rc5Va3Qe40-gzGzoHsz',
+      appKey     : 'MQPc1ivxhbYLOgvDoNN46OIs',
+      placeholder: "Just go go",
+      avatar     : 'monsterid',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : 'zh-cn' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+    </div>
+</body>
+</html>

@@ -1,0 +1,477 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>张国丰</title>
+  
+  <subtitle>记录生活的点滴美好</subtitle>
+  <link href="https://abumaster.com/sitemap.xml" rel="self"/>
+  
+  <link href="https://abumaster.com/"/>
+  <updated>2021-07-18T14:15:35.390Z</updated>
+  <id>https://abumaster.com/</id>
+  
+  <author>
+    <name>abumaster</name>
+    
+  </author>
+  
+  <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>高性能队列-Disruptor</title>
+    <link href="https://abumaster.com/2021/07/09/020ca791b0e0/"/>
+    <id>https://abumaster.com/2021/07/09/020ca791b0e0/</id>
+    <published>2021-07-09T21:46:42.000Z</published>
+    <updated>2021-07-18T14:15:35.390Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;Disruptor是英国外汇交易公司LMAX开发的一个高性能队列，研发的初衷是解决内存队列的延迟问题（在性能测试中发现竟然与I/O操作处于同样的数量级）。基于Disruptor开发的系统单线程能支撑每秒600万订单，2010年在QCon演讲后，获得了业界关注。2011年，企业应用软件专家Martin Fowler专门撰写长文介绍。同年它还获得了Oracle官方的Duke大奖。&lt;br&gt;目前，包括Apache Storm、Camel、Log4j 2在内的很多知名项目都应用了Disruptor以获取高性能。需要特别指出的是，这里所说的队列是系统内部的内存队列，而不是Kafka这样的分布式队列。以下的队列都单一系统内的队列。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="学习" scheme="https://abumaster.com/categories/%E5%AD%A6%E4%B9%A0/"/>
+    
+    
+    <category term="架构" scheme="https://abumaster.com/tags/%E6%9E%B6%E6%9E%84/"/>
+    
+    <category term="Java" scheme="https://abumaster.com/tags/Java/"/>
+    
+    <category term="队列" scheme="https://abumaster.com/tags/%E9%98%9F%E5%88%97/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Kafka多线程消费</title>
+    <link href="https://abumaster.com/2021/07/07/52a6430f0800/"/>
+    <id>https://abumaster.com/2021/07/07/52a6430f0800/</id>
+    <published>2021-07-07T21:54:09.000Z</published>
+    <updated>2021-07-18T14:15:35.390Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;当Kafka的生产速度大于消费速度的时候，会出现消息挤压，这时可以用多线程提高消费能力。而&lt;code&gt;KafkaConsumer&lt;/code&gt;不支持多线程并发访问，否则会报&lt;code&gt;ConcurrentmodificationException&lt;/code&gt;的异常。有两种方法发挥多线程消费的能力。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="学习" scheme="https://abumaster.com/categories/%E5%AD%A6%E4%B9%A0/"/>
+    
+    
+    <category term="架构" scheme="https://abumaster.com/tags/%E6%9E%B6%E6%9E%84/"/>
+    
+    <category term="Java" scheme="https://abumaster.com/tags/Java/"/>
+    
+    <category term="Kafka" scheme="https://abumaster.com/tags/Kafka/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Kafka高性能的原因</title>
+    <link href="https://abumaster.com/2021/07/04/2b9bd120bd10/"/>
+    <id>https://abumaster.com/2021/07/04/2b9bd120bd10/</id>
+    <published>2021-07-04T21:37:54.000Z</published>
+    <updated>2021-07-18T14:15:35.390Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;Kafka读写快的原因分析。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="学习" scheme="https://abumaster.com/categories/%E5%AD%A6%E4%B9%A0/"/>
+    
+    
+    <category term="架构" scheme="https://abumaster.com/tags/%E6%9E%B6%E6%9E%84/"/>
+    
+    <category term="Java" scheme="https://abumaster.com/tags/Java/"/>
+    
+    <category term="Kafka" scheme="https://abumaster.com/tags/Kafka/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>JavaIO模型</title>
+    <link href="https://abumaster.com/2021/07/02/2389dc599aaf/"/>
+    <id>https://abumaster.com/2021/07/02/2389dc599aaf/</id>
+    <published>2021-07-02T21:27:03.000Z</published>
+    <updated>2021-07-18T14:15:35.390Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;输入输出（IO）是指计算机同任何外部设备之间的数据传递。常见的输入输出设备有文件、键盘、打印机、屏幕等。数据可以按记录（或称数据块）的方式传递，也可以用流的方式传递。&lt;br&gt;在socket编程中，需要读取和输出数据，这就用到了IO模型。Java在1.4之前用到的是同步阻塞的方式，性能存在瓶颈，后来又出现了非阻塞io，再后来1.7之后，又出现了AIO，总体来说这三类IO模型。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="学习" scheme="https://abumaster.com/categories/%E5%AD%A6%E4%B9%A0/"/>
+    
+    
+    <category term="架构" scheme="https://abumaster.com/tags/%E6%9E%B6%E6%9E%84/"/>
+    
+    <category term="Java" scheme="https://abumaster.com/tags/Java/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Kafka工作流程分析</title>
+    <link href="https://abumaster.com/2021/07/01/1f6d63b89ff3/"/>
+    <id>https://abumaster.com/2021/07/01/1f6d63b89ff3/</id>
+    <published>2021-07-01T21:37:27.000Z</published>
+    <updated>2021-07-18T14:15:35.390Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;Kafka的架构和数据的存储、生产、消费的流程。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="学习" scheme="https://abumaster.com/categories/%E5%AD%A6%E4%B9%A0/"/>
+    
+    
+    <category term="架构" scheme="https://abumaster.com/tags/%E6%9E%B6%E6%9E%84/"/>
+    
+    <category term="Java" scheme="https://abumaster.com/tags/Java/"/>
+    
+    <category term="Kafka" scheme="https://abumaster.com/tags/Kafka/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Kafka基础</title>
+    <link href="https://abumaster.com/2021/06/30/8c1d2ddf378e/"/>
+    <id>https://abumaster.com/2021/06/30/8c1d2ddf378e/</id>
+    <published>2021-06-30T18:20:16.000Z</published>
+    <updated>2021-07-18T14:15:35.390Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;Kafka是由 Apache 软件基金会开发的一个开源流处理平台， 是一个&lt;strong&gt;分布式&lt;/strong&gt;的基于&lt;strong&gt;发布/订阅模式的消息队列&lt;/strong&gt;（Message Queue），支持多分区、多副本，主要应用于大数据实时处理领域。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="学习" scheme="https://abumaster.com/categories/%E5%AD%A6%E4%B9%A0/"/>
+    
+    
+    <category term="架构" scheme="https://abumaster.com/tags/%E6%9E%B6%E6%9E%84/"/>
+    
+    <category term="Java" scheme="https://abumaster.com/tags/Java/"/>
+    
+    <category term="Kafka" scheme="https://abumaster.com/tags/Kafka/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Redis内存淘汰策略</title>
+    <link href="https://abumaster.com/2021/06/20/9c5c4e49fb5e/"/>
+    <id>https://abumaster.com/2021/06/20/9c5c4e49fb5e/</id>
+    <published>2021-06-20T21:28:37.000Z</published>
+    <updated>2021-07-18T14:15:35.390Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;将Redis作为缓存使用，难免会遇到内存空间存储瓶颈，当Redis内存超出物理内存限制时，内存数据就会与磁盘产生频繁交换，使Redis性能急剧下降。此时如何淘汰无用数据释放空间，存储新数据就变得尤为重要了。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="学习" scheme="https://abumaster.com/categories/%E5%AD%A6%E4%B9%A0/"/>
+    
+    
+    <category term="架构" scheme="https://abumaster.com/tags/%E6%9E%B6%E6%9E%84/"/>
+    
+    <category term="Java" scheme="https://abumaster.com/tags/Java/"/>
+    
+    <category term="Redis" scheme="https://abumaster.com/tags/Redis/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Redis三种集群模式</title>
+    <link href="https://abumaster.com/2021/06/19/05210412b3a7/"/>
+    <id>https://abumaster.com/2021/06/19/05210412b3a7/</id>
+    <published>2021-06-19T21:09:52.000Z</published>
+    <updated>2021-07-18T14:15:35.390Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;Redis一般支持三种集群方案：主从复制、哨兵（Sentinel）模式、Cluster模式，至少面试被问到的时候能够说上来一两句才不至于尴尬。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="学习" scheme="https://abumaster.com/categories/%E5%AD%A6%E4%B9%A0/"/>
+    
+    
+    <category term="架构" scheme="https://abumaster.com/tags/%E6%9E%B6%E6%9E%84/"/>
+    
+    <category term="Java" scheme="https://abumaster.com/tags/Java/"/>
+    
+    <category term="Redis" scheme="https://abumaster.com/tags/Redis/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Redis持久化原理</title>
+    <link href="https://abumaster.com/2021/06/18/f9aa24185d13/"/>
+    <id>https://abumaster.com/2021/06/18/f9aa24185d13/</id>
+    <published>2021-06-18T20:09:11.000Z</published>
+    <updated>2021-07-18T14:15:35.390Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;Redis数据是放在内存中的，如果断电、故障、内存满都会丢失数据。因此，有的时候需要将数据持久化到磁盘中，故障恢复后，将重要的数据重新加载到内存中。一般提供了两种方式：&lt;strong&gt;RDB&lt;/strong&gt;和&lt;strong&gt;AOF&lt;/strong&gt;，抑或两者的结合。以下对两种方式进行阐述和对比优缺点。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="学习" scheme="https://abumaster.com/categories/%E5%AD%A6%E4%B9%A0/"/>
+    
+    
+    <category term="架构" scheme="https://abumaster.com/tags/%E6%9E%B6%E6%9E%84/"/>
+    
+    <category term="Java" scheme="https://abumaster.com/tags/Java/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>SpringBoot读取配置文件的方式</title>
+    <link href="https://abumaster.com/2021/04/18/872dca647654/"/>
+    <id>https://abumaster.com/2021/04/18/872dca647654/</id>
+    <published>2021-04-18T19:25:38.000Z</published>
+    <updated>2021-07-18T14:15:35.390Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;Spring Boot有3种读取自定义配置的方法，不用自己单独写解析类。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="学习" scheme="https://abumaster.com/categories/%E5%AD%A6%E4%B9%A0/"/>
+    
+    
+    <category term="架构" scheme="https://abumaster.com/tags/%E6%9E%B6%E6%9E%84/"/>
+    
+    <category term="Java" scheme="https://abumaster.com/tags/Java/"/>
+    
+    <category term="SpringBoot" scheme="https://abumaster.com/tags/SpringBoot/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>抽象队列同步器AQS</title>
+    <link href="https://abumaster.com/2021/04/05/c8c61fa07b88/"/>
+    <id>https://abumaster.com/2021/04/05/c8c61fa07b88/</id>
+    <published>2021-04-05T16:05:55.000Z</published>
+    <updated>2021-07-18T14:15:35.390Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;Java中的大部分同步类都是基于&lt;code&gt;AbstractQueuedSynchronizer&lt;/code&gt;实现的，简单来说就是抽象类、队列、同步器，可以用来构建锁和同步器的框架。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="学习" scheme="https://abumaster.com/categories/%E5%AD%A6%E4%B9%A0/"/>
+    
+    
+    <category term="架构" scheme="https://abumaster.com/tags/%E6%9E%B6%E6%9E%84/"/>
+    
+    <category term="Java" scheme="https://abumaster.com/tags/Java/"/>
+    
+    <category term="高并发" scheme="https://abumaster.com/tags/%E9%AB%98%E5%B9%B6%E5%8F%91/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Java线上故障排查</title>
+    <link href="https://abumaster.com/2021/02/22/ed2a8aa291a2/"/>
+    <id>https://abumaster.com/2021/02/22/ed2a8aa291a2/</id>
+    <published>2021-02-22T21:37:43.000Z</published>
+    <updated>2021-07-18T14:15:35.390Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;线上故障主要会包括cpu、磁盘、内存以及网络问题，而大多数故障可能会包含不止一个层面的问题，所以进行排查时候尽量四个方面依次排查一遍。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="学习" scheme="https://abumaster.com/categories/%E5%AD%A6%E4%B9%A0/"/>
+    
+    
+    <category term="架构" scheme="https://abumaster.com/tags/%E6%9E%B6%E6%9E%84/"/>
+    
+    <category term="Java" scheme="https://abumaster.com/tags/Java/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Java对象</title>
+    <link href="https://abumaster.com/2021/02/21/7706420f8190/"/>
+    <id>https://abumaster.com/2021/02/21/7706420f8190/</id>
+    <published>2021-02-21T15:40:22.000Z</published>
+    <updated>2021-07-18T14:15:35.390Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;一个对象在可以被使用之前必须被正确地初始化，实例化，对象是如何创建，由什么组成，又是放在JVM的哪个地方，以及如何使用对象。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="学习" scheme="https://abumaster.com/categories/%E5%AD%A6%E4%B9%A0/"/>
+    
+    
+    <category term="架构" scheme="https://abumaster.com/tags/%E6%9E%B6%E6%9E%84/"/>
+    
+    <category term="Java" scheme="https://abumaster.com/tags/Java/"/>
+    
+    <category term="JVM" scheme="https://abumaster.com/tags/JVM/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>几种引用的区别</title>
+    <link href="https://abumaster.com/2021/02/21/f7c3169388c1/"/>
+    <id>https://abumaster.com/2021/02/21/f7c3169388c1/</id>
+    <published>2021-02-21T08:47:11.000Z</published>
+    <updated>2021-07-18T14:15:35.390Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;Java中的引用类似C++中的指针，用来指向一个对象，指向对象的变量叫做引用变量，除了8中基本类型，其他的类型都是引用类型，主要包括：类、接口、数组、枚举、注解。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="学习" scheme="https://abumaster.com/categories/%E5%AD%A6%E4%B9%A0/"/>
+    
+    
+    <category term="架构" scheme="https://abumaster.com/tags/%E6%9E%B6%E6%9E%84/"/>
+    
+    <category term="Java" scheme="https://abumaster.com/tags/Java/"/>
+    
+    <category term="JVM" scheme="https://abumaster.com/tags/JVM/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Java性能调优</title>
+    <link href="https://abumaster.com/2021/02/20/1e043ca4a77e/"/>
+    <id>https://abumaster.com/2021/02/20/1e043ca4a77e/</id>
+    <published>2021-02-20T16:35:10.000Z</published>
+    <updated>2021-07-18T14:15:35.390Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;如何根据项目的需要设置Java运行参数，以达到更好的运行效率，及出现性能瓶颈时如何优化，还有哪些潜在的经验和规则。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="学习" scheme="https://abumaster.com/categories/%E5%AD%A6%E4%B9%A0/"/>
+    
+    
+    <category term="架构" scheme="https://abumaster.com/tags/%E6%9E%B6%E6%9E%84/"/>
+    
+    <category term="Java" scheme="https://abumaster.com/tags/Java/"/>
+    
+    <category term="JVM" scheme="https://abumaster.com/tags/JVM/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>常见的OOM异常</title>
+    <link href="https://abumaster.com/2021/02/19/8772a3dc4600/"/>
+    <id>https://abumaster.com/2021/02/19/8772a3dc4600/</id>
+    <published>2021-02-19T22:21:07.000Z</published>
+    <updated>2021-07-18T14:15:35.390Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;在《Java虚拟机规范》的规定里，除了程序计数器外，虚拟机内存的其他几个运行时区域都有发生 OutOfMemoryError 异常的可能，本章主要介绍相关的OOM异常。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="学习" scheme="https://abumaster.com/categories/%E5%AD%A6%E4%B9%A0/"/>
+    
+    
+    <category term="架构" scheme="https://abumaster.com/tags/%E6%9E%B6%E6%9E%84/"/>
+    
+    <category term="Java" scheme="https://abumaster.com/tags/Java/"/>
+    
+    <category term="JVM" scheme="https://abumaster.com/tags/JVM/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>垃圾回收实战</title>
+    <link href="https://abumaster.com/2021/02/17/587d49719b87/"/>
+    <id>https://abumaster.com/2021/02/17/587d49719b87/</id>
+    <published>2021-02-17T10:23:13.000Z</published>
+    <updated>2021-07-18T14:15:35.390Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;接下来根据详细的栗子，说明GC日志的查看，JVM参数的调整。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="学习" scheme="https://abumaster.com/categories/%E5%AD%A6%E4%B9%A0/"/>
+    
+    
+    <category term="架构" scheme="https://abumaster.com/tags/%E6%9E%B6%E6%9E%84/"/>
+    
+    <category term="Java" scheme="https://abumaster.com/tags/Java/"/>
+    
+    <category term="JVM" scheme="https://abumaster.com/tags/JVM/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>垃圾回收</title>
+    <link href="https://abumaster.com/2021/02/16/48dfb675769e/"/>
+    <id>https://abumaster.com/2021/02/16/48dfb675769e/</id>
+    <published>2021-02-16T09:40:11.000Z</published>
+    <updated>2021-07-18T14:15:35.390Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;Java相比C/C++的一个显著特点就是自动管理内存，不用程序员关心内存的释放，当Java程序也出现OOM异常的时候，不禁让人摸不着头脑，Java是如何实现对内存的管理的？主要是JVM实现的垃圾回收机制（Garbage collection），判断堆中的对象实例或者数据是否是垃圾，是垃圾就定时清理掉。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="学习" scheme="https://abumaster.com/categories/%E5%AD%A6%E4%B9%A0/"/>
+    
+    
+    <category term="架构" scheme="https://abumaster.com/tags/%E6%9E%B6%E6%9E%84/"/>
+    
+    <category term="Java" scheme="https://abumaster.com/tags/Java/"/>
+    
+    <category term="JVM" scheme="https://abumaster.com/tags/JVM/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>JVM内存结构</title>
+    <link href="https://abumaster.com/2021/02/14/5756a042adc6/"/>
+    <id>https://abumaster.com/2021/02/14/5756a042adc6/</id>
+    <published>2021-02-14T18:51:09.000Z</published>
+    <updated>2021-07-18T14:15:35.390Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;&lt;strong&gt;Java&lt;/strong&gt; 虚拟机定义了若干种程序运行期间会使用到的运行时数据区，其中有一些会随着虚拟机启动而创建，随着虚拟机退出而销毁。另外一些则是与线程对应，这些与线程对应的数据区域会随着线程开始和结束而创建和销毁。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;线程私有的：程序计数器、栈、本地方法栈；&lt;/li&gt;
+&lt;li&gt;线程共享的：堆、方法区（永久代或元空间、代码缓存）。&lt;/li&gt;
+&lt;/ul&gt;</summary>
+    
+    
+    
+    <category term="学习" scheme="https://abumaster.com/categories/%E5%AD%A6%E4%B9%A0/"/>
+    
+    
+    <category term="架构" scheme="https://abumaster.com/tags/%E6%9E%B6%E6%9E%84/"/>
+    
+    <category term="Java" scheme="https://abumaster.com/tags/Java/"/>
+    
+    <category term="JVM" scheme="https://abumaster.com/tags/JVM/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>JVM是什么</title>
+    <link href="https://abumaster.com/2021/02/13/c857e5cfb1e5/"/>
+    <id>https://abumaster.com/2021/02/13/c857e5cfb1e5/</id>
+    <published>2021-02-13T15:22:30.000Z</published>
+    <updated>2021-07-18T14:15:35.390Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;我们都知道Java程序与其他面向对象语言（C++）的主要区别是一次编译跨平台运行，自动内存管理，自动垃圾回收等功能。这些功能都得益于Java提供的一种叫做JVM的东西，JVM到底是什么，为什么能做到，下文进行详细描述。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="学习" scheme="https://abumaster.com/categories/%E5%AD%A6%E4%B9%A0/"/>
+    
+    
+    <category term="架构" scheme="https://abumaster.com/tags/%E6%9E%B6%E6%9E%84/"/>
+    
+    <category term="Java" scheme="https://abumaster.com/tags/Java/"/>
+    
+    <category term="JVM" scheme="https://abumaster.com/tags/JVM/"/>
+    
+  </entry>
+  
+</feed>
