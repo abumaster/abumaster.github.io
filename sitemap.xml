@@ -1,0 +1,501 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>张国丰</title>
+  
+  <subtitle>记录生活的点滴美好</subtitle>
+  <link href="https://abumaster.com/sitemap.xml" rel="self"/>
+  
+  <link href="https://abumaster.com/"/>
+  <updated>2022-10-07T15:01:44.394Z</updated>
+  <id>https://abumaster.com/</id>
+  
+  <author>
+    <name>abumaster</name>
+    
+  </author>
+  
+  <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>JavaNIO之Channel</title>
+    <link href="https://abumaster.com/2022/10/07/b46b286bda13/"/>
+    <id>https://abumaster.com/2022/10/07/b46b286bda13/</id>
+    <published>2022-10-07T22:02:18.000Z</published>
+    <updated>2022-10-07T15:01:44.394Z</updated>
+    
+    
+    <summary type="html">JavaNIO中的Channel类似Stream，可以读写，通常与Buffer进行交互，不存储数据，只负责在具体的io设备与buffer之间搬运数据。</summary>
+    
+    
+    
+    <category term="学习" scheme="https://abumaster.com/categories/%E5%AD%A6%E4%B9%A0/"/>
+    
+    
+    <category term="架构" scheme="https://abumaster.com/tags/%E6%9E%B6%E6%9E%84/"/>
+    
+    <category term="Java" scheme="https://abumaster.com/tags/Java/"/>
+    
+    <category term="NIO" scheme="https://abumaster.com/tags/NIO/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>JavaNIO中的Buffer详解</title>
+    <link href="https://abumaster.com/2022/10/06/5c59f81e0726/"/>
+    <id>https://abumaster.com/2022/10/06/5c59f81e0726/</id>
+    <published>2022-10-06T12:49:34.000Z</published>
+    <updated>2022-10-07T15:01:44.394Z</updated>
+    
+    
+    <summary type="html">Java NIO的基础，Buffer的使用详解</summary>
+    
+    
+    
+    <category term="学习" scheme="https://abumaster.com/categories/%E5%AD%A6%E4%B9%A0/"/>
+    
+    
+    <category term="架构" scheme="https://abumaster.com/tags/%E6%9E%B6%E6%9E%84/"/>
+    
+    <category term="Java" scheme="https://abumaster.com/tags/Java/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>创建自定义签名证书</title>
+    <link href="https://abumaster.com/2022/07/12/4ca91dae9392/"/>
+    <id>https://abumaster.com/2022/07/12/4ca91dae9392/</id>
+    <published>2022-07-12T14:07:24.000Z</published>
+    <updated>2022-10-07T15:01:44.398Z</updated>
+    
+    
+    <summary type="html">几种常见的证书文件的格式</summary>
+    
+    
+    
+    <category term="学习" scheme="https://abumaster.com/categories/%E5%AD%A6%E4%B9%A0/"/>
+    
+    
+    <category term="架构" scheme="https://abumaster.com/tags/%E6%9E%B6%E6%9E%84/"/>
+    
+    <category term="Java" scheme="https://abumaster.com/tags/Java/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Java的SPI机制详解</title>
+    <link href="https://abumaster.com/2022/01/18/63dde0a688a3/"/>
+    <id>https://abumaster.com/2022/01/18/63dde0a688a3/</id>
+    <published>2022-01-18T20:50:13.000Z</published>
+    <updated>2022-10-07T15:01:44.394Z</updated>
+    
+    
+    <summary type="html">SPI（Service Provider Interface），是JDK内置的一种 服务提供发现机制，可以用来启用框架扩展和替换组件，主要是被框架的开发人员使用，比如java.sql.Driver接口，其他不同厂商可以针对同一接口做出不同的实现，MySQL和PostgreSQL都有不同的实现提供给用户，而Java的SPI机制可以为某个接口寻找服务实现。Java中SPI机制主要思想是将装配的控制权移到程序之外，在模块化设计中这个机制尤其重要，其核心思想就是 解耦。</summary>
+    
+    
+    
+    <category term="学习" scheme="https://abumaster.com/categories/%E5%AD%A6%E4%B9%A0/"/>
+    
+    
+    <category term="架构" scheme="https://abumaster.com/tags/%E6%9E%B6%E6%9E%84/"/>
+    
+    <category term="Java" scheme="https://abumaster.com/tags/Java/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Spring表达式语言</title>
+    <link href="https://abumaster.com/2022/01/16/cfd09d7196ad/"/>
+    <id>https://abumaster.com/2022/01/16/cfd09d7196ad/</id>
+    <published>2022-01-16T19:12:10.000Z</published>
+    <updated>2022-10-07T15:01:44.398Z</updated>
+    
+    
+    <summary type="html">Spring表达式语言（简称SpEl）是一个支持查询和操作运行时对象导航图功能的强大的表达式语言. 它的语法类似于传统EL，但提供额外的功能，最出色的就是函数调用和简单字符串的模板函数。</summary>
+    
+    
+    
+    <category term="学习" scheme="https://abumaster.com/categories/%E5%AD%A6%E4%B9%A0/"/>
+    
+    
+    <category term="架构" scheme="https://abumaster.com/tags/%E6%9E%B6%E6%9E%84/"/>
+    
+    <category term="Spring" scheme="https://abumaster.com/tags/Spring/"/>
+    
+    <category term="Java" scheme="https://abumaster.com/tags/Java/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>kali引导修复</title>
+    <link href="https://abumaster.com/2021/12/15/8189364d5fde/"/>
+    <id>https://abumaster.com/2021/12/15/8189364d5fde/</id>
+    <published>2021-12-15T20:34:07.000Z</published>
+    <updated>2022-10-07T15:01:44.398Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;p&gt;grub2 默认安装在第一硬盘（hd0）的 mbr，其实就是把引导文件 boot.img 写入硬盘的 mbr，当然，用户也可以选择不写入硬盘 mbr 而是写入 linux 分区的引导扇区。启动时根据 mbr 所提供信息找到启动分区后，加载分区内的 grub 核心文件</summary>
+        
+      
+    
+    
+    
+    <category term="学习" scheme="https://abumaster.com/categories/%E5%AD%A6%E4%B9%A0/"/>
+    
+    
+    <category term="架构" scheme="https://abumaster.com/tags/%E6%9E%B6%E6%9E%84/"/>
+    
+    <category term="Linux" scheme="https://abumaster.com/tags/Linux/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>响应式编程实战</title>
+    <link href="https://abumaster.com/2021/12/12/38d8217a11a4/"/>
+    <id>https://abumaster.com/2021/12/12/38d8217a11a4/</id>
+    <published>2021-12-12T20:51:59.000Z</published>
+    <updated>2022-10-07T15:01:44.398Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;Reactor相关API和数据结构的使用。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="学习" scheme="https://abumaster.com/categories/%E5%AD%A6%E4%B9%A0/"/>
+    
+    
+    <category term="架构" scheme="https://abumaster.com/tags/%E6%9E%B6%E6%9E%84/"/>
+    
+    <category term="Java" scheme="https://abumaster.com/tags/Java/"/>
+    
+    <category term="Reactor" scheme="https://abumaster.com/tags/Reactor/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>理解响应式编程</title>
+    <link href="https://abumaster.com/2021/12/12/0fbcbe7452a8/"/>
+    <id>https://abumaster.com/2021/12/12/0fbcbe7452a8/</id>
+    <published>2021-12-12T19:38:14.000Z</published>
+    <updated>2022-10-07T15:01:44.398Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;&lt;strong&gt;命令式编程&lt;/strong&gt;是工作中常用的，一行一行的代码，正像一行一行的命令，程序按照顺序，执行。当一条命令阻塞，那么整个任务也就阻塞了。&lt;strong&gt;响应式编程&lt;/strong&gt;则是一种基于观察者的设计模式，目的提升系统的响应能力，是一种异步非阻塞的模型，基于数据驱动，当数据变化后，其他的观察者会收到相应的通知，Java8中引入了诸如CompletionStage及其实现，CompletableFuture等概念。响应式宣言，&lt;a href=&quot;https://www.reactivemanifesto.org/&quot;&gt;The Reactive Manifesto&lt;/a&gt;。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="学习" scheme="https://abumaster.com/categories/%E5%AD%A6%E4%B9%A0/"/>
+    
+    
+    <category term="架构" scheme="https://abumaster.com/tags/%E6%9E%B6%E6%9E%84/"/>
+    
+    <category term="Java" scheme="https://abumaster.com/tags/Java/"/>
+    
+    <category term="Reactor" scheme="https://abumaster.com/tags/Reactor/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Java调用C++程序</title>
+    <link href="https://abumaster.com/2021/12/06/8a176caeb500/"/>
+    <id>https://abumaster.com/2021/12/06/8a176caeb500/</id>
+    <published>2021-12-06T19:55:05.000Z</published>
+    <updated>2022-10-07T15:01:44.394Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;Java调用Native方法。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="学习" scheme="https://abumaster.com/categories/%E5%AD%A6%E4%B9%A0/"/>
+    
+    
+    <category term="架构" scheme="https://abumaster.com/tags/%E6%9E%B6%E6%9E%84/"/>
+    
+    <category term="Java" scheme="https://abumaster.com/tags/Java/"/>
+    
+    <category term="CPP" scheme="https://abumaster.com/tags/CPP/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Spring环境集成EventBus</title>
+    <link href="https://abumaster.com/2021/11/28/8bcc10c7152e/"/>
+    <id>https://abumaster.com/2021/11/28/8bcc10c7152e/</id>
+    <published>2021-11-28T21:36:36.000Z</published>
+    <updated>2022-10-07T15:01:44.398Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;Guava中提供了一种事件总线（EventBus）的技术，是观察者模式的一种实现。jdk中也提供了Observer的接口，Guava的优势是更易于使用，并且提供了同步和异步的通知机制。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="学习" scheme="https://abumaster.com/categories/%E5%AD%A6%E4%B9%A0/"/>
+    
+    
+    <category term="架构" scheme="https://abumaster.com/tags/%E6%9E%B6%E6%9E%84/"/>
+    
+    <category term="Java" scheme="https://abumaster.com/tags/Java/"/>
+    
+    <category term="观察者模式" scheme="https://abumaster.com/tags/%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8F/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Guava的EventBus使用</title>
+    <link href="https://abumaster.com/2021/11/28/d3229bc11575/"/>
+    <id>https://abumaster.com/2021/11/28/d3229bc11575/</id>
+    <published>2021-11-28T14:18:39.000Z</published>
+    <updated>2022-10-07T15:01:44.394Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;Guava中提供了一种事件总线（EventBus）的技术，是观察者模式的一种实现。jdk中也提供了Observer的接口，Guava的优势是更易于使用，并且提供了同步和异步的通知机制。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="学习" scheme="https://abumaster.com/categories/%E5%AD%A6%E4%B9%A0/"/>
+    
+    
+    <category term="架构" scheme="https://abumaster.com/tags/%E6%9E%B6%E6%9E%84/"/>
+    
+    <category term="Java" scheme="https://abumaster.com/tags/Java/"/>
+    
+    <category term="观察者模式" scheme="https://abumaster.com/tags/%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8F/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>redis为什么这么快</title>
+    <link href="https://abumaster.com/2021/09/09/a8d74cf7e699/"/>
+    <id>https://abumaster.com/2021/09/09/a8d74cf7e699/</id>
+    <published>2021-09-09T18:23:04.000Z</published>
+    <updated>2022-10-07T15:01:44.398Z</updated>
+    
+    
+    
+    
+    <category term="学习" scheme="https://abumaster.com/categories/%E5%AD%A6%E4%B9%A0/"/>
+    
+    
+    <category term="架构" scheme="https://abumaster.com/tags/%E6%9E%B6%E6%9E%84/"/>
+    
+    <category term="Java" scheme="https://abumaster.com/tags/Java/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>MySQL性能分析工具explain的使用</title>
+    <link href="https://abumaster.com/2021/09/06/48cec5e9508c/"/>
+    <id>https://abumaster.com/2021/09/06/48cec5e9508c/</id>
+    <published>2021-09-06T22:19:11.000Z</published>
+    <updated>2022-10-07T15:01:44.398Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;MySQL 提供了一个&lt;code&gt;EXPLAIN&lt;/code&gt;命令，它可以对&lt;code&gt;SELECT&lt;/code&gt;语句进行分析，并输出&lt;code&gt;SELECT&lt;/code&gt;执行的详细信息， 以供开发人员针对性优化。&lt;br&gt;本文介绍它的使用，及如何分析输出。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="数据库" scheme="https://abumaster.com/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/"/>
+    
+    
+    <category term="MySQL" scheme="https://abumaster.com/tags/MySQL/"/>
+    
+    <category term="Java" scheme="https://abumaster.com/tags/Java/"/>
+    
+    <category term="学习" scheme="https://abumaster.com/tags/%E5%AD%A6%E4%B9%A0/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>设计模式六大原则</title>
+    <link href="https://abumaster.com/2021/09/05/8600aea798be/"/>
+    <id>https://abumaster.com/2021/09/05/8600aea798be/</id>
+    <published>2021-09-05T16:00:28.000Z</published>
+    <updated>2022-10-07T15:01:44.398Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;&lt;strong&gt;设计模式（面向对象设计）六大原则，具体如下：&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;单一职责原则（类和方法，接口）&lt;/li&gt;
+&lt;li&gt;开闭原则（扩展开放，修改关闭）&lt;/li&gt;
+&lt;li&gt;里氏替换原则（基类和子类之间的关系）&lt;/li&gt;
+&lt;li&gt;依赖倒置原则（依赖抽象接口，而不是具体对象）&lt;/li&gt;
+&lt;li&gt;接口隔离原则（接口按照功能细分）&lt;/li&gt;
+&lt;li&gt;迪米特法则（类与类之间的亲疏关系）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;a href=&quot;http://c.biancheng.net/view/1322.html&quot;&gt;参考文档&lt;/a&gt;&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="学习" scheme="https://abumaster.com/categories/%E5%AD%A6%E4%B9%A0/"/>
+    
+    
+    <category term="架构" scheme="https://abumaster.com/tags/%E6%9E%B6%E6%9E%84/"/>
+    
+    <category term="Java" scheme="https://abumaster.com/tags/Java/"/>
+    
+    <category term="设计模式" scheme="https://abumaster.com/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>索引失效的情况</title>
+    <link href="https://abumaster.com/2021/09/05/092df776da7e/"/>
+    <id>https://abumaster.com/2021/09/05/092df776da7e/</id>
+    <published>2021-09-05T09:47:58.000Z</published>
+    <updated>2022-10-07T15:01:44.398Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;p&gt;索引失效的几种情况：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;违反最左前缀法则，缺少左边索引字段&lt;/li&gt;
+&lt;li&gt;在索引列上进行操作，函数操作&lt;/li&gt;
+&lt;li&gt;索引范围条件的右边索引会失效&lt;/li&gt;
+&lt;li&gt;尽量使用覆盖索引，select索引字段&lt;/li&gt;
+&lt;li&gt;使用&lt;code&gt;!</summary>
+        
+      
+    
+    
+    
+    <category term="数据库" scheme="https://abumaster.com/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/"/>
+    
+    
+    <category term="Java" scheme="https://abumaster.com/tags/Java/"/>
+    
+    <category term="mysql" scheme="https://abumaster.com/tags/mysql/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>ACID特性的实现原理</title>
+    <link href="https://abumaster.com/2021/09/03/3a95b7129d33/"/>
+    <id>https://abumaster.com/2021/09/03/3a95b7129d33/</id>
+    <published>2021-09-03T22:28:01.000Z</published>
+    <updated>2022-10-07T15:01:44.394Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;ACID是衡量&lt;strong&gt;事务&lt;/strong&gt;的四个特性：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;原子性（Atomicity）&lt;/li&gt;
+&lt;li&gt;一致性（Consistency）&lt;/li&gt;
+&lt;li&gt;隔离性（Isolation）&lt;/li&gt;
+&lt;li&gt;持久性（Durability）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;MySQL的事务是如何实现这个特性的呢？&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="数据库" scheme="https://abumaster.com/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/"/>
+    
+    
+    <category term="架构" scheme="https://abumaster.com/tags/%E6%9E%B6%E6%9E%84/"/>
+    
+    <category term="事务" scheme="https://abumaster.com/tags/%E4%BA%8B%E5%8A%A1/"/>
+    
+    <category term="MySQL" scheme="https://abumaster.com/tags/MySQL/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>如何保证redis缓存与数据库数据一致性</title>
+    <link href="https://abumaster.com/2021/09/03/97307a6d7d99/"/>
+    <id>https://abumaster.com/2021/09/03/97307a6d7d99/</id>
+    <published>2021-09-03T19:24:46.000Z</published>
+    <updated>2022-10-07T15:01:44.398Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;一般在系统中为了用户的体验，需要加上缓存来提升用户的体验。一般对实时性比较高的数据，可以不添加缓存；对于读多写少的数据，或者比较耗时的需要加缓存，并且要设置过期时间，或者更新数据的时候失效；另外一种基本不变的字典数据，则可以把过期时间设置长一点，或者直接使用jvm缓存，map等去存储。&lt;br&gt;那么，不可避免的问题是，你更新了数据库，缓存怎么去更新呢，才能保证与数据库中数据的一致性。一般大致有四种方法（一般缓存的数据都是经过接口调用后组合的数据，更新缓存的代价太大，因此不需要更新缓存，直接删除即可）：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;del&gt;先更新数据库，后更新缓存&lt;/del&gt;&lt;/li&gt;
+&lt;li&gt;先更新数据库，后删除缓存&lt;/li&gt;
+&lt;li&gt;&lt;del&gt;先更新缓存，后更新数据库&lt;/del&gt;&lt;/li&gt;
+&lt;li&gt;先删除缓存，后更新数据库&lt;/li&gt;
+&lt;/ol&gt;</summary>
+    
+    
+    
+    <category term="redis" scheme="https://abumaster.com/categories/redis/"/>
+    
+    
+    <category term="架构" scheme="https://abumaster.com/tags/%E6%9E%B6%E6%9E%84/"/>
+    
+    <category term="Java" scheme="https://abumaster.com/tags/Java/"/>
+    
+    <category term="redis" scheme="https://abumaster.com/tags/redis/"/>
+    
+    <category term="思路" scheme="https://abumaster.com/tags/%E6%80%9D%E8%B7%AF/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>消息队列如何保证消息的可靠传输</title>
+    <link href="https://abumaster.com/2021/09/01/1bb93938c4b7/"/>
+    <id>https://abumaster.com/2021/09/01/1bb93938c4b7/</id>
+    <published>2021-09-01T22:01:12.000Z</published>
+    <updated>2022-10-07T15:01:44.398Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;由于网络延迟、机器等原因，消息队列可能出现消息的丢失，那么如何解决这个问题呢。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="学习" scheme="https://abumaster.com/categories/%E5%AD%A6%E4%B9%A0/"/>
+    
+    
+    <category term="架构" scheme="https://abumaster.com/tags/%E6%9E%B6%E6%9E%84/"/>
+    
+    <category term="Java" scheme="https://abumaster.com/tags/Java/"/>
+    
+    <category term="mq" scheme="https://abumaster.com/tags/mq/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>MySQL中的几种日志</title>
+    <link href="https://abumaster.com/2021/08/29/dbcd355b7078/"/>
+    <id>https://abumaster.com/2021/08/29/dbcd355b7078/</id>
+    <published>2021-08-29T15:00:34.000Z</published>
+    <updated>2022-10-07T15:01:44.398Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;MySQL中主要有六种日志文件，分别是：重做日志（redo log）、回滚日志（undo log）、二进制日志（binlog）、错误日志（errorlog）、慢查询日志（slow query log）、一般查询日志（general log），中继日志（relay log）。他们在MySQL中扮演着不同的角色，在ACID中起着至关重要的作用。Innodb存储引擎为例。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="数据库" scheme="https://abumaster.com/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/"/>
+    
+    
+    <category term="MySQL" scheme="https://abumaster.com/tags/MySQL/"/>
+    
+    <category term="数据库" scheme="https://abumaster.com/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Maven中scope的含义</title>
+    <link href="https://abumaster.com/2021/08/25/80dfda2cb312/"/>
+    <id>https://abumaster.com/2021/08/25/80dfda2cb312/</id>
+    <published>2021-08-25T22:15:16.000Z</published>
+    <updated>2022-10-07T15:01:44.398Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;Maven依赖中有个scope元素，控制依赖jar包的使用范围。用的不当，容易造成jar包冲突，程序异常等。通常有：&lt;strong&gt;compile&lt;/strong&gt;、&lt;strong&gt;runtime&lt;/strong&gt;、&lt;strong&gt;provided&lt;/strong&gt;、&lt;strong&gt;test&lt;/strong&gt;、&lt;strong&gt;system&lt;/strong&gt;、&lt;strong&gt;import&lt;/strong&gt;。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="maven" scheme="https://abumaster.com/categories/maven/"/>
+    
+    
+    <category term="maven" scheme="https://abumaster.com/tags/maven/"/>
+    
+  </entry>
+  
+</feed>

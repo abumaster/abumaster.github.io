@@ -1,0 +1,321 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>类加载子系统 | 张国丰</title><meta name="keywords" content="架构,Java,JVM"><meta name="author" content="abumaster"><meta name="copyright" content="abumaster"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="类加载子系统负责把二进制字节码（Class文件）装载到内存，并对数据进行校验、转换解析、初始化，最终生成被虚拟机直接使用的Java类型。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="类加载子系统">
+<meta property="og:url" content="https://abumaster.com/2021/02/13/72e0796d355d/index.html">
+<meta property="og:site_name" content="张国丰">
+<meta property="og:description" content="类加载子系统负责把二进制字节码（Class文件）装载到内存，并对数据进行校验、转换解析、初始化，最终生成被虚拟机直接使用的Java类型。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://abumaster.com/uploads/default-header.jpg">
+<meta property="article:published_time" content="2021-02-13T15:19:50.000Z">
+<meta property="article:modified_time" content="2022-10-07T15:01:44.398Z">
+<meta property="article:author" content="abumaster">
+<meta property="article:tag" content="架构">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="JVM">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://abumaster.com/uploads/default-header.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://abumaster.com/2021/02/13/72e0796d355d/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//www.google-analytics.com" crossorigin=""/><link rel="preconnect" href="//hm.baidu.com"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><script>var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?0181b489d29ea00055dcd71fb036bb70";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script><script async="async" src="https://www.googletagmanager.com/gtag/js?id=UA-180676830-1"></script><script>window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'UA-180676830-1');
+</script><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"search.xml","languages":{"hits_empty":"找不到您查询的内容：${query}"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js',
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+    },
+    fancybox: {
+      js: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isanchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '类加载子系统',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2022-10-07 15:01:44'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if (GLOBAL_CONFIG_SITE.isHome && /iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 5.2.0"><link rel="alternate" href="/sitemap.xml" title="张国丰" type="application/atom+xml">
+</head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">加载中...</div></div></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/uploads/logo.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">文章</div><div class="length-num">70</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">标签</div><div class="length-num">38</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">分类</div><div class="length-num">7</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 清单</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/mywallpaper/"><i class="fa-fw fas fa-images"></i><span> 照片</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友情链接</span></a></div><div class="menus_item"><a class="site-page" href="/hpptalk/"><i class="fa-fw fas fa-envelope"></i><span> 说说</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">张国丰</a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 清单</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/mywallpaper/"><i class="fa-fw fas fa-images"></i><span> 照片</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友情链接</span></a></div><div class="menus_item"><a class="site-page" href="/hpptalk/"><i class="fa-fw fas fa-envelope"></i><span> 说说</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">类加载子系统</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2021-02-13T15:19:50.000Z" title="发表于 2021-02-13 15:19:50">2021-02-13</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-10-07T15:01:44.398Z" title="更新于 2022-10-07 15:01:44">2022-10-07</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%AD%A6%E4%B9%A0/">学习</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">3.1k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>10分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="类加载子系统"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div><article class="post-content" id="article-container"><p><strong>类加载子系统</strong>负责把二进制字节码（Class文件）装载到内存，并对数据进行校验、转换解析、初始化，最终生成被虚拟机直接使用的Java类型。</p>
+<a id="more"></a>
+
+<h2 id="类加载子系统的作用"><a href="#类加载子系统的作用" class="headerlink" title="类加载子系统的作用"></a>类加载子系统的作用</h2><p>类加载子系统的组成：<br><img src="https://ae03.alicdn.com/kf/H3d7fb30852ef4f0aa57be5ae6ebf0d45i.jpg" alt="copy.png"></p>
+<p>作用：</p>
+<ul>
+<li>类加载子系统负责从文件系统或者网络中加载 class 文件，class 文件在文件开头有特定的文件标识（0xCAFEBABE）</li>
+<li>ClassLoader 只负责 class 文件的加载。至于它是否可以运行，则由 Execution Engine 决定</li>
+<li>加载的类信息存放于一块称为方法区的内存空间。除了类的信息外，方法区中还存放运行时常量池信息，可能还包括字符串字面量和数字常量（这部分常量信息是class文件中常量池部分的内存映射）</li>
+<li>Class 对象是存放在堆区的。</li>
+</ul>
+<h2 id="类加载过程"><a href="#类加载过程" class="headerlink" title="类加载过程"></a>类加载过程</h2><p>类从被加载到虚拟机内存中开始，到卸载出内存为止，它的整个生命周期包括：<strong>加载</strong>、<strong>验证</strong>、<strong>准备</strong>、<strong>解析</strong>、<strong>初始化</strong>、<strong>使用</strong>和<strong>卸载</strong>七个阶段。(验证、准备和解析又统称为连接，为了支持 Java 语言的运行时绑定，所以解析阶段也可以是在初始化之后进行的。以上顺序都只是说开始的顺序，实际过程中是交叉的混合式进行的，加载过程中可能就已经开始验证了)</p>
+<p><img src="https://ae02.alicdn.com/kf/H8f3041654793451ea92477350347045b5.jpg" alt="copy.png"></p>
+<h3 id="1-类加载"><a href="#1-类加载" class="headerlink" title="1. 类加载"></a>1. 类加载</h3><p>类加载过程中需要一个叫做类加载器的工具，作为一个搬运的角色，将class文件装载到JVM中，类加载一般分为：<strong>引导类加载器</strong>、<strong>扩展类加载器</strong>、<strong>应用类加载器</strong>和<strong>用户自定义的加载器</strong>。</p>
+<h3 id="2-连接（Linking）"><a href="#2-连接（Linking）" class="headerlink" title="2. 连接（Linking）"></a>2. 连接（Linking）</h3><p><strong>验证（Verify）</strong><br>目的是确保Class文件中的字节流中包含的信息符合当前虚拟机要求，保证被加载类的正确性，主要包含四种验证：文件格式验证、元数据验证、字节码验证、符号引用验证。</p>
+<p><strong>准备（Prepare）</strong><br>为类变量分配内存并且设置该类变量的默认初始值，如基础类型的初始值为：</p>
+<table>
+<thead>
+<tr>
+<th>数据类型</th>
+<th>零值（初始值）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>int</td>
+<td>0</td>
+</tr>
+<tr>
+<td>long</td>
+<td>0L</td>
+</tr>
+<tr>
+<td>short</td>
+<td>(short)0</td>
+</tr>
+<tr>
+<td>char</td>
+<td>‘\u0000’</td>
+</tr>
+<tr>
+<td>byte</td>
+<td>(byte)0</td>
+</tr>
+<tr>
+<td>boolean</td>
+<td>false</td>
+</tr>
+<tr>
+<td>float</td>
+<td>0.0f</td>
+</tr>
+<tr>
+<td>double</td>
+<td>0.0d</td>
+</tr>
+<tr>
+<td>reference</td>
+<td>null</td>
+</tr>
+</tbody></table>
+<p>所有的引用类型，包含对象，包装类型均为null。<br>final修饰的static在会直接初始化为想要的值，类变量（static修饰）的则会在准备阶段初始化为零值，放在方法区中，实例变量则不会初始化，会在初始化时随着变量放到堆中。</p>
+<p><strong>解析</strong><br>当通过准备阶段之后，JVM 针对类或接口、字段、类方法、接口方法、方法类型、方法句柄和调用点限定符 7 类引用进行解析。这个阶段的主要任务是将其在常量池中的符号引用替换成直接其在内存中的直接引用。</p>
+<h3 id="3-初始化"><a href="#3-初始化" class="headerlink" title="3. 初始化"></a>3. 初始化</h3><p>用户定义的Java代码开始执行，JVM会根据语句的执行顺序对类对象进行初始化，一般遇到以下的5中情况会触发初始化：</p>
+<ul>
+<li>遇到 new、getstatic、putstatic、invokestatic 这四条字节码指令时，如果类没有进行过初始化，则需要先触发其初始化。生成这4条指令的最常见的Java代码场景是：使用new关键字实例化对象的时候、读取或设置一个类的静态字段（被final修饰、已在编译器把结果放入常量池的静态字段除外）的时候，以及调用一个类的静态方法的时候。</li>
+<li>使用<code> java.lang.reflect</code>包的方法对类进行反射调用的时候，如果类没有进行过初始化，则需要先触发其初始化。</li>
+<li>当初始化一个类的时候，如果发现其父类还没有进行过初始化，则需要先触发其父类的初始化。</li>
+<li>当虚拟机启动时，用户需要指定一个要执行的主类（包含main()方法的那个类），虚拟机会先初始化这个主类。</li>
+<li>当使用 JDK1.7 动态语言支持时，如果一个<code> java.lang.invoke.MethodHandle</code>实例最后的解析结果<code>REF_getstatic,REF_putstatic,REF_invokeStatic </code>的方法句柄，并且这个方法句柄所对应的类没有进行初始化，则需要先出触发其初始化。</li>
+</ul>
+<p>除了以上的几种情况，其他使用Java类的方式被看作时对类的被动使用，不会触发类的初始化。</p>
+<h3 id="4-使用"><a href="#4-使用" class="headerlink" title="4. 使用"></a>4. 使用</h3><p>当 JVM 完成初始化阶段之后，JVM 便开始从入口方法开始执行用户的程序代码。</p>
+<h3 id="5-卸载"><a href="#5-卸载" class="headerlink" title="5. 卸载"></a>5. 卸载</h3><p>当用户程序代码执行完毕后，JVM 便开始销毁创建的 Class 对象，最后负责运行的 JVM 也退出内存。</p>
+<h2 id="类加载器"><a href="#类加载器" class="headerlink" title="类加载器"></a>类加载器</h2><p>类加载器主要负责将Java字节码加载到内存中，生成一个<code>java.lang.Class</code>对象。主要分为如下几类：</p>
+<p><strong>启动类加载器（引导类加载器，Bootstrap ClassLoader）</strong><br>这个类加载使用 C/C++ 语言实现，嵌套在 JVM 内部<br>它用来加载 Java 的核心库（<code>JAVA_HOME/jre/lib/rt.jar</code>、<code>resource.jar</code>或<code>sun.boot.class.path</code>路径下的内容），用于提供 JVM 自身需要的类，没有父加载器<br>加载扩展类和应用程序类加载器，并指定为他们的父类加载器<br>出于安全考虑，Bootstrap 启动类加载器只加载名为<code>java、Javax、sun</code>等开头的类</p>
+<p><strong>扩展类加载器（Extension ClassLoader）</strong><br>Java 语言编写，由 <code>sun.misc.Launcher$ExtClassLoader</code> 实现<br>派生于 ClassLoader<br>父类加载器为启动类加载器<br>从<code> java.ext.dirs</code>系统属性所指定的目录中加载类库，或从 JDK 的安装目录的 <code>jre/lib/ext</code> 子目录（扩展目录）下加载类库。如果用户创建的 JAR 放在此目录下，也会自动由扩展类加载器加载</p>
+<p><strong>应用程序类加载器（也叫系统类加载器，AppClassLoader）</strong><br>Java 语言编写，由 <code>sun.misc.Lanucher$AppClassLoader</code>实现<br>派生于 ClassLoader<br>父类加载器为扩展类加载器<br>它负责加载环境变量 classpath 或系统属性<code>java.class.path</code>指定路径下的类库<br>该类加载是程序中默认的类加载器，一般来说，Java 应用的类都是由它来完成加载的<br>通过<code>ClassLoader#getSystemClassLoader()</code>方法可以获取到该类加载器</p>
+<p><strong>用户自定义类加载器</strong><br>在 Java 的日常应用程序开发中，类的加载几乎是由 3 种类加载器相互配合执行的，在必要时，我们还可以自定义类加载器，来定制类的加载方式。</p>
+<p>为什么要使用用户自定义类加载器：</p>
+<ul>
+<li>隔离加载类</li>
+<li>修改类加载的方式</li>
+<li>扩展加载源（可以从数据库、云端等指定来源加载类）</li>
+<li>防止源码泄露（Java 代码容易被反编译，如果加密后，自定义加载器加载类的时候就可以先解密，再加载）</li>
+</ul>
+<p>如何实现自定义类加载器？<br>首先继承抽像类<code>java.lang.ClassLoader</code>；<br>JDK1.2之后，覆盖<code>findClass()</code>方法，编写自己的查找类的方式；<br>，如果没有太过于复杂的需求，可以直接继承<code>URLClassLoader</code>类，这样就可以避免自己去编写 <code>findClass() </code>方法及其获取字节码流的方式，使自定义类加载器编写更加简洁。</p>
+<p><strong>举栗子:</strong><br>自定义类加载器的代码为：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyClassLoader</span> <span class="keyword">extends</span> <span class="title">ClassLoader</span> </span>&#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 自己实现类的查找逻辑</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> name 名称</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> /</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> ClassNotFoundException 未找到</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">protected</span> Class&lt;?&gt; findClass(String name) <span class="keyword">throws</span> ClassNotFoundException &#123;</span><br><span class="line">        String resource = <span class="string">&quot;E:/programCode/work&quot;</span>;</span><br><span class="line">        File source = <span class="keyword">new</span> File(resource,name.replace(<span class="string">&quot;.&quot;</span>,<span class="string">&quot;/&quot;</span>).concat(<span class="string">&quot;.class&quot;</span>));</span><br><span class="line">        <span class="keyword">if</span>(!source.exists()) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> ClassNotFoundException(name+<span class="string">&quot; not found!&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">try</span>(FileInputStream fileInputStream = <span class="keyword">new</span> FileInputStream(source)) &#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;自定义类加载器读取类文件...&quot;</span>);</span><br><span class="line">            <span class="keyword">byte</span>[] bytes = <span class="keyword">new</span> <span class="keyword">byte</span>[fileInputStream.available()];</span><br><span class="line">            fileInputStream.read(bytes);</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">super</span>.defineClass(name,bytes,<span class="number">0</span>,bytes.length);</span><br><span class="line">        &#125;<span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;class not found!&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">super</span>.findClass(name);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>使用自定义类加载器调用方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        MyClassLoader classLoader = <span class="keyword">new</span> MyClassLoader();</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            Class&lt;?&gt; aClass = classLoader.loadClass(<span class="string">&quot;com.abumaster.javabase.jvm.LoadDemo&quot;</span>);</span><br><span class="line">            System.out.println(<span class="string">&quot;类名称：&quot;</span>+aClass.getName());</span><br><span class="line">            System.out.println(<span class="string">&quot;类加载器：&quot;</span>+aClass.getClassLoader());</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 实例化一个对象i</span></span><br><span class="line">            Object o = aClass.getConstructors()[<span class="number">0</span>].newInstance();</span><br><span class="line">            <span class="comment">// 调用print方法方法</span></span><br><span class="line">            aClass.getMethod(<span class="string">&quot;print&quot;</span>,String.class).invoke(o,<span class="string">&quot;what?&quot;</span>);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        &#125;<span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="双亲委派机制"><a href="#双亲委派机制" class="headerlink" title="双亲委派机制"></a>双亲委派机制</h2><p>Java 虚拟机对 class 文件采用的是按需加载的方式，也就是说当需要使用该类的时候才会将它的 class 文件加载到内存生成 class 对象。而且加载某个类的 class 文件时，Java 虚拟机采用的是双亲委派模式，即把请求交给父类处理，它是一种任务委派模式。</p>
+<h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><p>几种类加载器及其结构：<br><img src="https://ae02.alicdn.com/kf/Hf12b0e3329864eb198a14b78aeff80baP.jpg" alt="copy.png"></p>
+<p><strong>说明：</strong></p>
+<ol>
+<li>启动类加载器，由<code>C++</code>实现，java中无法直接获取，加载<code>jre/lib</code>下的类；</li>
+<li>扩展类加载器，由<code>Java</code>实现，可以在Java中获取，加载<code>jre/lib/ext</code>下的类；</li>
+<li>系统类加载器/应用程序类加载器，一般常与其打交道，用于加载程序类路径下的类，可以通过<code>ClassLoader.getSystemClassLoader</code>返回；</li>
+<li>自定义类加载器，用户自定义类的加载路径及其加载方式，满足特殊的业务需求，比如Jar包加密。</li>
+</ol>
+<p><em>注：通过类的全路径和加载这个类的类加载器确定同一个类。</em></p>
+<ul>
+<li>如果一个类加载器收到了类加载请求，它并不会自己先去加载，而是把这个请求委托给父类的加载器去执行；</li>
+<li>如果父类加载器还存在其父类加载器，则进一步向上委托，依次递归，请求最终将到达顶层的启动类加载器；</li>
+<li>如果父类加载器可以完成类加载任务，就成功返回，倘若父类加载器无法完成此加载任务，子加载器才会尝试自己去加载，这就是双亲委派模式。</li>
+</ul>
+<p><strong>优势：</strong></p>
+<ul>
+<li><strong>避免类的重复加载</strong>，JVM 中区分不同类，不仅仅是根据类名，相同的 class 文件被不同的 ClassLoader 加载就属于两个不同的类（比如，Java中的Object类，无论哪一个类加载器要加载这个类，最终都是委派给处于模型最顶端的启动类加载器进行加载，如果不采用双亲委派模型，由各个类加载器自己去加载的话，系统中会存在多种不同的 Object 类）</li>
+<li><strong>保护程序安全</strong>，防止核心 API 被随意篡改，避免用户自己编写的类动态替换 Java 的一些核心类，比如我们自定义类：<code>java.lang.String</code>；</li>
+<li>保证Java核心代码的安全，当自定义一个系统类的时候，则会优先使用引导类加载器加载，提供一种沙箱安全机制。</li>
+</ul>
+<h3 id="破坏双亲委派模型"><a href="#破坏双亲委派模型" class="headerlink" title="破坏双亲委派模型"></a>破坏双亲委派模型</h3><h4 id="为什么要破坏双亲委派？"><a href="#为什么要破坏双亲委派？" class="headerlink" title="为什么要破坏双亲委派？"></a>为什么要破坏双亲委派？</h4><p>因为在某些情况下父类加载器需要委托子类加载器去加载<code>class</code>文件或者jar包。受到加载范围的限制，父类加载器无法加载到需要的文件。<br>以<code>Driver</code>接口为栗，由于<code>Driver</code>接口定义在<code>jdk</code>当中的，而其实现由各个数据库的服务商来提供，比如<code>mysq</code>l的就写了<code>MySQL Connector</code>，那么问题就来了，<code>DriverManager</code>要加载各个实现了<code>Driver</code>接口的实现类，然后进行管理，但是<code>DriverManager</code>由<strong>启动类加载器</strong>加载，只能记载<code>JAVA_HOME</code>的<code>lib</code>下文件，而其实现是由服务商提供的，由<strong>系统类加载器</strong>加载，这个时候就需要启动类加载器来委托子类来加载<code>Driver</code>实现，从而破坏了双亲委派。<br>利用破坏双亲委派来实现代码热替换（每次修改类文件，不需要重启服务）。因为一个<code> Class</code> 只能被一个<code>ClassLoader</code> 加载一次，否则会报<code> java.lang.LinkageError</code>。当我们想要实现代码热部署时，可以每次都<code>new</code> 一个自定义的 <code>ClassLoader</code> 来加载新的 Class文件。JSP 的实现动态修改就是使用此特性实现。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">abumaster</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://abumaster.com/2021/02/13/72e0796d355d/">https://abumaster.com/2021/02/13/72e0796d355d/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://abumaster.com" target="_blank">张国丰</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E6%9E%B6%E6%9E%84/">架构</a><a class="post-meta__tags" href="/tags/Java/">Java</a><a class="post-meta__tags" href="/tags/JVM/">JVM</a></div><div class="post_share"><div class="social-share" data-image="/uploads/default-header.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><div class="post-reward"><div class="reward-button button--animated"><i class="fas fa-qrcode"></i> 打赏</div><div class="reward-main"><ul class="reward-all"><li class="reward-item"><a href="/uploads/wx1.jpg" target="_blank"><img class="post-qr-code-img" src="/uploads/wx1.jpg" alt="微信"/></a><div class="post-qr-code-desc">微信</div></li><li class="reward-item"><a href="/uploads/zfb.jpg" target="_blank"><img class="post-qr-code-img" src="/uploads/zfb.jpg" alt="支付宝"/></a><div class="post-qr-code-desc">支付宝</div></li></ul></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2021/02/13/c857e5cfb1e5/"><img class="prev-cover" src="/uploads/default-header.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">JVM是什么</div></div></a></div><div class="next-post pull-right"><a href="/2021/01/02/170e17e7d2f9/"><img class="next-cover" src="/uploads/default-header-2.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">mybatis自定义TypeHandler</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2021/02/13/c857e5cfb1e5/" title="JVM是什么"><img class="cover" src="/uploads/default-header.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-02-13</div><div class="title">JVM是什么</div></div></a></div><div><a href="/2021/02/21/7706420f8190/" title="Java对象"><img class="cover" src="/uploads/default-header.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-02-21</div><div class="title">Java对象</div></div></a></div><div><a href="/2021/02/20/1e043ca4a77e/" title="Java性能调优"><img class="cover" src="/uploads/default-header-2.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-02-20</div><div class="title">Java性能调优</div></div></a></div><div><a href="/2021/02/21/f7c3169388c1/" title="几种引用的区别"><img class="cover" src="/uploads/default-header.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-02-21</div><div class="title">几种引用的区别</div></div></a></div><div><a href="/2021/02/16/48dfb675769e/" title="垃圾回收"><img class="cover" src="/uploads/default-header.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-02-16</div><div class="title">垃圾回收</div></div></a></div><div><a href="/2021/02/17/587d49719b87/" title="垃圾回收实战"><img class="cover" src="/uploads/default-header-2.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-02-17</div><div class="title">垃圾回收实战</div></div></a></div></div></div><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/uploads/logo.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">abumaster</div><div class="author-info__description">明年岂无年，心事恐蹉跎。<br/>努力尽今夕，少年犹可夸。</div></div><div class="card-info-data"><div class="card-info-data-item is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">70</div></a></div><div class="card-info-data-item is-center"><a href="/tags/"><div class="headline">标签</div><div class="length-num">38</div></a></div><div class="card-info-data-item is-center"><a href="/categories/"><div class="headline">分类</div><div class="length-num">7</div></a></div></div><a class="button--animated" id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/abumaster"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="mailto:gfzhang92@gmail.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn card-announcement-animation"></i><span>公告</span></div><div class="announcement_content">简简单单，平平凡凡</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%AD%90%E7%B3%BB%E7%BB%9F%E7%9A%84%E4%BD%9C%E7%94%A8"><span class="toc-number">1.</span> <span class="toc-text">类加载子系统的作用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B1%BB%E5%8A%A0%E8%BD%BD%E8%BF%87%E7%A8%8B"><span class="toc-number">2.</span> <span class="toc-text">类加载过程</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E7%B1%BB%E5%8A%A0%E8%BD%BD"><span class="toc-number">2.1.</span> <span class="toc-text">1. 类加载</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E8%BF%9E%E6%8E%A5%EF%BC%88Linking%EF%BC%89"><span class="toc-number">2.2.</span> <span class="toc-text">2. 连接（Linking）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="toc-number">2.3.</span> <span class="toc-text">3. 初始化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E4%BD%BF%E7%94%A8"><span class="toc-number">2.4.</span> <span class="toc-text">4. 使用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-%E5%8D%B8%E8%BD%BD"><span class="toc-number">2.5.</span> <span class="toc-text">5. 卸载</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8"><span class="toc-number">3.</span> <span class="toc-text">类加载器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%8C%E4%BA%B2%E5%A7%94%E6%B4%BE%E6%9C%BA%E5%88%B6"><span class="toc-number">4.</span> <span class="toc-text">双亲委派机制</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8E%9F%E7%90%86"><span class="toc-number">4.1.</span> <span class="toc-text">原理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A0%B4%E5%9D%8F%E5%8F%8C%E4%BA%B2%E5%A7%94%E6%B4%BE%E6%A8%A1%E5%9E%8B"><span class="toc-number">4.2.</span> <span class="toc-text">破坏双亲委派模型</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E7%A0%B4%E5%9D%8F%E5%8F%8C%E4%BA%B2%E5%A7%94%E6%B4%BE%EF%BC%9F"><span class="toc-number">4.2.1.</span> <span class="toc-text">为什么要破坏双亲委派？</span></a></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2022/10/07/b46b286bda13/" title="JavaNIO之Channel">JavaNIO之Channel</a><time datetime="2022-10-07T22:02:18.000Z" title="发表于 2022-10-07 22:02:18">2022-10-07</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2022/10/06/5c59f81e0726/" title="JavaNIO中的Buffer详解">JavaNIO中的Buffer详解</a><time datetime="2022-10-06T12:49:34.000Z" title="发表于 2022-10-06 12:49:34">2022-10-06</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2022/07/12/4ca91dae9392/" title="创建自定义签名证书">创建自定义签名证书</a><time datetime="2022-07-12T14:07:24.000Z" title="发表于 2022-07-12 14:07:24">2022-07-12</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2022/01/18/63dde0a688a3/" title="Java的SPI机制详解">Java的SPI机制详解</a><time datetime="2022-01-18T20:50:13.000Z" title="发表于 2022-01-18 20:50:13">2022-01-18</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2022/01/16/cfd09d7196ad/" title="Spring表达式语言">Spring表达式语言</a><time datetime="2022-01-16T19:12:10.000Z" title="发表于 2022-01-16 19:12:10">2022-01-16</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2017 - 2022 By abumaster</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div id="local-search"><div class="search-dialog"><div class="search-dialog__title" id="local-search-title">本地搜索</div><div id="local-input-panel"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div></div><hr/><div id="local-search-results"></div><span class="search-close-button"><i class="fas fa-times"></i></span></div><div id="search-mask"></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script src="/js/search/local-search.js"></script><script>var preloader = {
+  endLoading: () => {
+    document.body.style.overflow = 'auto';
+    document.getElementById('loading-box').classList.add("loaded")
+  },
+  initLoading: () => {
+    document.body.style.overflow = '';
+    document.getElementById('loading-box').classList.remove("loaded")
+
+  }
+}
+window.addEventListener('load',preloader.endLoading())</script><div class="js-pjax"><script>function loadValine () {
+  function initValine () {
+    const valine = new Valine(Object.assign({
+      el: '#vcomment',
+      appId: 'Q8k6f8EXgvCgQ9Rc5Va3Qe40-gzGzoHsz',
+      appKey: 'MQPc1ivxhbYLOgvDoNN46OIs',
+      placeholder: 'Please leave your footprints',
+      avatar: 'monsterid',
+      meta: 'nick,mail,link'.split(','),
+      pageSize: '10',
+      lang: 'en',
+      recordIP: false,
+      serverURLs: '',
+      emojiCDN: '',
+      emojiMaps: "",
+      enableQQ: false,
+      path: window.location.pathname,
+      requiredFields: ["nick,mail"],
+      visitor: false
+    }, null))
+  }
+
+  if (typeof Valine === 'function') initValine() 
+  else getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js').then(initValine)
+}
+
+if ('Valine' === 'Valine' || !false) {
+  if (false) btf.loadComment(document.getElementById('vcomment'),loadValine)
+  else setTimeout(loadValine, 0)
+} else {
+  function loadOtherComment () {
+    loadValine()
+  }
+}</script></div><canvas class="fireworks" mobile="false"></canvas><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/fireworks.min.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
